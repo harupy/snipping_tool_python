@@ -13,7 +13,7 @@ class Menu(QMainWindow):
     default_title = "Snipping Tool"
 
     # numpy_image is the desired image we want to display given as a numpy array.
-    def __init__(self, numpy_image=None, snip_number=None, start_position=(300, 300, 350, 250)):
+    def __init__(self, numpy_image=None, snip_number=None, start_position=(300, 300, 350, 250), screenshot_position=(0, 0)):
         super().__init__()
 
         self.drawing = False
@@ -64,7 +64,7 @@ class Menu(QMainWindow):
         self.toolbar.addWidget(brush_size_button)
         self.toolbar.addAction(exit_window)
 
-        self.snippingTool = SnippingTool.SnippingWidget()
+        self.snippingTool = SnippingTool.SnippingWidget(x=screenshot_position[0], y=screenshot_position[1])
         self.setGeometry(*start_position)
 
         # From the second initialization, both arguments will be valid
@@ -137,5 +137,21 @@ class Menu(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mainMenu = Menu()
+    
+    # determine coordinate (lowest x & y)
+    topX = 0
+    topY = 0
+
+    desktop = app.desktop()
+    desktop_count = desktop.screenCount()
+
+    for i in range(desktop_count):
+        geo = app.desktop().screenGeometry(i)
+        print(i, geo)
+        _x = geo.x()
+        _y = geo.y()
+        topX = _x if _x < topX else topX
+        topY = _y if _y < topY else topY
+    
+    mainMenu = Menu(screenshot_position=(topX, topY))
     sys.exit(app.exec_())
