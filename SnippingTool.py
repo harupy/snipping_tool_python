@@ -5,6 +5,11 @@ from PIL import ImageGrab
 from PyQt5 import QtWidgets, QtCore, QtGui
 import SnippingMenu
 from PyQt5.QtCore import Qt
+import ctypes
+from pyrobot import Robot
+
+
+robot = Robot()
 
 
 class SnippingWidget(QtWidgets.QWidget):
@@ -12,15 +17,21 @@ class SnippingWidget(QtWidgets.QWidget):
     is_snipping = False
     background = True
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, x=0, y=0):
         super(SnippingWidget, self).__init__()
         self.parent = parent
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
+        size = (ctypes.windll.user32.GetSystemMetrics(78), ctypes.windll.user32.GetSystemMetrics(79))
+
         root = tk.Tk()
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        self.setGeometry(0, 0, screen_width, screen_height)
+        
+        self.x = x
+        self.y = y
+        self.width = size[0]
+        self.height = size[1]
+
+        self.setGeometry(self.x, self.y, self.width, self.height)
         self.begin = QtCore.QPoint()
         self.end = QtCore.QPoint()
 
@@ -28,7 +39,6 @@ class SnippingWidget(QtWidgets.QWidget):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         SnippingWidget.background = False
         SnippingWidget.is_snipping = True
-        self.setWindowOpacity(0.3)
         QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
         print('Capture the screen...')
         print('Press q if you want to quit...')
@@ -62,25 +72,31 @@ class SnippingWidget(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         self.begin = event.pos()
+        self.globalBegin = event.globalPos()
         self.end = self.begin
         self.update()
 
     def mouseMoveEvent(self, event):
         self.end = event.pos()
+        self.globalEnd = event.globalPos()
         self.update()
 
     def mouseReleaseEvent(self, event):
         SnippingWidget.num_snip += 1
         SnippingWidget.is_snipping = False
         QtWidgets.QApplication.restoreOverrideCursor()
-        x1 = min(self.begin.x(), self.end.x())
-        y1 = min(self.begin.y(), self.end.y())
-        x2 = max(self.begin.x(), self.end.x())
-        y2 = max(self.begin.y(), self.end.y())
+
+        x1 = min(self.globalBegin.x(), self.globalEnd.x())
+        y1 = min(self.globalBegin.y(), self.globalEnd.y())
+        x2 = max(self.globalBegin.x(), self.globalEnd.x())
+        y2 = max(self.globalBegin.y(), self.globalEnd.y())
 
         self.repaint()
         QtWidgets.QApplication.processEvents()
-        img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
+
+        coords = (x1, y1, x2, y2)
+        img = robot.take_screenshot(coords)
+
         QtWidgets.QApplication.processEvents()
         img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
 
