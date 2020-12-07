@@ -5,7 +5,7 @@ from PIL import ImageGrab
 import numpy as np
 import cv2
 
-
+## Testing initial commit
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
