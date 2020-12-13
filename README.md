@@ -16,5 +16,6 @@ pip install pyqt5 opencv-python
 
 ### Troubleshooting
 There might be an issue with the numpy package for Windows. This is to be fixed in 2021 January.
-See here : 
+See here : #### https://stackoverflow.com/questions/64729944/runtimeerror-the-current-numpy-installation-fails-to-pass-a-sanity-check-due-to
+
 pip uninstall numpy
