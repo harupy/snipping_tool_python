@@ -1,0 +1,10 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    // "python.pythonPath": "D:/Programs/Python/python.exe"
+
+    // Here you can specify your own Python path
+    // Ensure that you when you install packages 
+    // with pip it is related to the same compiler
+    // as listed here 
+}
